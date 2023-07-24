@@ -16,3 +16,6 @@ A workaround way to get a DeepL translation API locally while not needing a API 
     "translated_text": "Bonjour !"
 }
 ```
+# Note
+First request of a different language will take up to 2 seconds, any after with the same language will be fast.
+Changing language has significant delay.
