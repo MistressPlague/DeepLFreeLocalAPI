@@ -50,6 +50,7 @@ namespace Libraries
         public class TranslationResult
         {
             public string translated_text;
+            public string error;
         }
 
         public class TranslationRequest
@@ -60,21 +61,21 @@ namespace Libraries
 
         internal static HttpClient client = new HttpClient();
 
-        internal static async Task<(bool, string)> TranslateText(string Text, string Language)
+        internal static async Task<TranslationResult> TranslateText(string Text, string Language)
         {
             var result = await client.PostAsync("http://127.0.0.1:5000/translate", new StringContent(JsonConvert.SerializeObject(new TranslationRequest { text = Text, lang = Language}), Encoding.UTF8, "application/json"));
 
-            var output = "";
+            TranslationResult output = null;
 
             try
             {
-                output = JsonConvert.DeserializeObject<TranslationResult>(await result.Content.ReadAsStringAsync()).translated_text;
+                output = JsonConvert.DeserializeObject<TranslationResult>(await result.Content.ReadAsStringAsync());
             }
             catch
             {
             }
 
-            return (!string.IsNullOrEmpty(output), output);
+            return output;
         }
     }
 }
