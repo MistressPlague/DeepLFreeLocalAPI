@@ -15,7 +15,8 @@ Due to this, you can rest assured this will likely never break, and basically ca
 # Expected Output JSON
 ```json
 {
-    "translated_text": "Bonjour !"
+    "translated_text": "Bonjour !",
+    "error": ""
 }
 ```
 
