@@ -7,8 +7,8 @@ Due to this, you can rest assured this will likely never break, and basically ca
 [POST, application/json, http://127.0.0.1:5000/translate]
 ```json
 {
-  "lang": "fr",
-  "text": "hello!"
+  "text": "hello!",
+  "lang": "fr"
 }
 ```
 
