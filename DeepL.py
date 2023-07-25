@@ -11,7 +11,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 playwright = sync_playwright().start()
-browser = playwright.chromium.launch(headless=True)
+browser = playwright.chromium.launch(headless=False)
 context = browser.new_context()
 
 page = context.new_page()
@@ -46,9 +46,9 @@ def translate_api():
 
 def translate(input_text: str, lang: str) -> str:
     # Select The Target Language
-    if not page.get_by_test_id("translator-target-lang-btn").inner_text().endswith(lang):
+    if page.get_by_test_id("translator-target-lang").get_attribute("dl-selected-lang") != lang:
         page.get_by_role("button", name=re.compile("Select target language", re.IGNORECASE)).click()
-        page.get_by_role("option", name=lang).click()
+        page.get_by_test_id("translator-lang-option-" + lang).click()
 
     # Fill In Our Text For Translating, Caching For Optimization, Filling Blank First For While Loop Later To Work
     sourcebox = page.get_by_role("textbox", name="Source text")
