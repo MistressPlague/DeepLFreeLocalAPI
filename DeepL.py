@@ -12,7 +12,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 playwright = sync_playwright().start()
-browser = playwright.chromium.launch(headless=False)
+browser = playwright.chromium.launch(headless=True)
 context = browser.new_context()
 
 page = context.new_page()
