@@ -5,7 +5,7 @@ A workaround way to get a DeepL translation API locally while not needing a API 
 [POST, http://127.0.0.1:5000/translate]
 ```json
 {
-  "lang": "French",
+  "lang": "fr",
   "text": "hello!"
 }
 ```
