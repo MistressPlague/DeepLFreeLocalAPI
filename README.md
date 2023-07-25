@@ -27,3 +27,6 @@ See [DeepL.cs](https://github.com/MistressPlague/DeepLFreeLocalAPI/blob/master/D
 First request of a different language will take up to 2 seconds, any after with the same language will be fast.
 Changing language has significant delay.
 This is due to how this works base-level, as it literally will have to click the language dropdown, and click the language button. It checks if you are translating the same language that is already selected, and if so, ignores this step, making it much faster for repeated output language use.
+
+# Requirements Install Command For Those New To Python
+`pip install -r requirements.txt`
