@@ -12,7 +12,7 @@ from flask import Flask, request
 app = Flask(__name__)
 
 playwright = sync_playwright().start()
-browser = playwright.chromium.launch(headless=False)
+browser = playwright.chromium.launch(headless=True)
 context = browser.new_context()
 
 page = context.new_page()
@@ -76,4 +76,4 @@ def translate(input_text: str, lang: str) -> str:
     print(outputbox.inner_text())
     return outputbox.inner_text()
 
-app.run()
+app.run(host='0.0.0.0')
