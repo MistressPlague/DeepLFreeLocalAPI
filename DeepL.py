@@ -50,6 +50,11 @@ def translate_api():
     return makejson({'translated_text': translated_text}), 200
 
 def translate(input_text: str, lang: str) -> str:
+    # Select The Target Language
+    if page.get_by_test_id("translator-target-lang").get_attribute("dl-selected-lang") != lang:
+        page.get_by_role("button", name=re.compile("Select target language", re.IGNORECASE)).click()
+        page.get_by_test_id("translator-lang-option-" + lang).click()
+
     # Fill In Our Text For Translating, Caching For Optimization, Filling Blank First For While Loop Later To Work
     sourcebox = page.get_by_role("textbox", name="Source text")
     sourcebox.click()
@@ -62,18 +67,9 @@ def translate(input_text: str, lang: str) -> str:
     # Wait For Translation To Finish By Waiting For Length > 0 And It Not To Be The Empty Newline DeepL Initializes It With
     while len(outputbox.inner_text()) == 0 or outputbox.inner_text() == '\n':
         time.sleep(1)
-    
-    # Select The Target Language
-    if page.get_by_test_id("translator-target-lang").get_attribute("dl-selected-lang") != lang and page.get_by_test_id("translator-target-lang").get_attribute("dl-selected-lang") != "en-EN":
-        page.get_by_role("button", name=re.compile("Select target language", re.IGNORECASE)).click()
-        page.get_by_test_id("translator-lang-option-" + lang).click()
-
-    # Wait For Translation To Finish By Waiting For Length > 0 And It Not To Be The Empty Newline DeepL Initializes It With
-    while len(outputbox.inner_text()) == 0 or outputbox.inner_text() == '\n':
-        time.sleep(1)
 
     # Return Translation
     print(outputbox.inner_text())
     return outputbox.inner_text()
 
-app.run(host='0.0.0.0')
+app.run()
