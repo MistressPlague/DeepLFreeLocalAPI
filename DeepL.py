@@ -12,7 +12,7 @@ from flask import Flask, request
 app = Flask(__name__)
 
 playwright = sync_playwright().start()
-browser = playwright.chromium.launch(headless=True)
+browser = playwright.chromium.launch(headless=False)
 context = browser.new_context()
 
 page = context.new_page()
@@ -50,27 +50,58 @@ def translate_api():
     return makejson({'translated_text': translated_text}), 200
 
 def translate(input_text: str, lang: str) -> str:
+    # Cache Translation Output TextBox
+    outputbox = page.wait_for_selector(f'[data-testid="translator-target-input"]', timeout=10000, state="visible")
+
+    targetlang = page.wait_for_selector(f'[data-testid="translator-target-lang"]', timeout=10000, state="visible")
+
+    # Select The Target Language
+    if targetlang.get_attribute("dl-selected-lang") != lang and targetlang.get_attribute("dl-selected-lang") != "en-EN":
+        print("Target Lang: " + lang)
+        print("Currently: " + targetlang.get_attribute("dl-selected-lang"))
+
+        page.wait_for_selector(f'[data-testid="translator-target-lang-btn"]', timeout=10000, state="visible").click()
+
+        langbutton = page.wait_for_selector(f'[data-testid="translator-lang-option-{lang}"]', timeout=10000, state="visible")
+
+        print(langbutton.inner_text())
+
+        langbutton.click()
+
+        print("Now: " + targetlang.get_attribute("dl-selected-lang"))
+
     # Fill In Our Text For Translating, Caching For Optimization, Filling Blank First For While Loop Later To Work
     sourcebox = page.get_by_role("textbox", name="Source text")
     sourcebox.click()
     sourcebox.fill("")
+
+    while outputbox.inner_text() != '\n':
+        time.sleep(1)
+
     sourcebox.fill(input_text)
 
-    # Cache Translation Output TextBox
-    outputbox = page.get_by_test_id("translator-target-input")
-
     # Wait For Translation To Finish By Waiting For Length > 0 And It Not To Be The Empty Newline DeepL Initializes It With
-    while len(outputbox.inner_text()) == 0 or outputbox.inner_text() == '\n':
+    while outputbox.inner_text() == '\n':
         time.sleep(1)
-    
+
     # Select The Target Language
-    if page.get_by_test_id("translator-target-lang").get_attribute("dl-selected-lang") != lang and page.get_by_test_id("translator-target-lang").get_attribute("dl-selected-lang") != "en-EN":
-        page.get_by_role("button", name=re.compile("Select target language", re.IGNORECASE)).click()
-        page.get_by_test_id("translator-lang-option-" + lang).click()
+    if targetlang.get_attribute("dl-selected-lang") != lang and targetlang.get_attribute("dl-selected-lang") != "en-EN":
+        print("Target Lang: " + lang)
+        print("Currently: " + targetlang.get_attribute("dl-selected-lang"))
 
-    # Wait For Translation To Finish By Waiting For Length > 0 And It Not To Be The Empty Newline DeepL Initializes It With
-    while len(outputbox.inner_text()) == 0 or outputbox.inner_text() == '\n':
-        time.sleep(1)
+        page.wait_for_selector(f'[data-testid="translator-target-lang-btn"]', timeout=10000, state="visible").click()
+
+        langbutton = page.wait_for_selector(f'[data-testid="translator-lang-option-{lang}"]', timeout=10000, state="visible")
+
+        print(langbutton.inner_text())
+
+        langbutton.click()
+
+        print("Now: " + targetlang.get_attribute("dl-selected-lang"))
+
+        # Wait For Translation To Finish By Waiting For Length > 0 And It Not To Be The Empty Newline DeepL Initializes It With
+        while outputbox.inner_text() == '\n':
+            time.sleep(1)
 
     # Return Translation
     print(outputbox.inner_text())
